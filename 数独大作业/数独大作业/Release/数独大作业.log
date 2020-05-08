@@ -1,0 +1,10 @@
+﻿  Console_Tools.cpp
+  main.cpp
+  Base.cpp
+  Source1.cpp
+  Tools.cpp
+  Generating code
+  Compiler version has changed, fall back to full compilation.
+  All 159 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  数独大作业.vcxproj -> F:\亲自写的作业\数独大作业\Release\数独大作业.exe
