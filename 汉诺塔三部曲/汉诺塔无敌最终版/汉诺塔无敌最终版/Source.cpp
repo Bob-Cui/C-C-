@@ -30,6 +30,19 @@ int Tower[3][11];
 int Tops[3];
 
 int Mode;
+/*
+将所有的相关数组全部都变为零
+*/
+
+void Empty()
+{
+	memset(Tower,0,sizeof(Tower));
+	memset(Tops, 0, sizeof(Tops));
+}
+
+
+
+
 /***************
 调节步骤之间休息的时间
 ***************/
@@ -38,19 +51,19 @@ void Sleep_time(int mode)
 	switch (mode)
 	{
 	case 1:
-		Sleep_Time= 5000;
+		Sleep_Time= 300;
 		break;
 	case 2:
-		Sleep_Time = 400;
-		break;
-	case 3:
-		Sleep_Time = 300;
-		break;
-	case 4:
 		Sleep_Time = 200;
 		break;
+	case 3:
+		Sleep_Time = 150;
+		break;
+	case 4:
+		Sleep_Time = 100;
+		break;
 	case 5:
-		Sleep_Time = 50;
+		Sleep_Time = 5;
 		break;
 	default:
 		Sleep_Time = 100;
@@ -118,41 +131,47 @@ void MOVE_Plate(int Length, int FROM, int TO, int HeightF, int HeightA, int Colo
 	MOVE_Horizontal(FROM, TO, Length, Color);
 	MOVE_Vertical(HeightA, TO, Length, Color, DOWN);
 }
-void Show_Number()
+void print()
 {
-	
-	cout << "A:";
-	for (int i = 1; i <= MAX - 1; i++)
-	{
+	printf("A: ");
+	for (int i = 1; i <= MAX; i++)
 		if (Tower[TowerA][i])
-			cout << setw(2) << Tower[TowerA][i];
+			printf("%d ", Tower[TowerA][i]);
 		else
-			cout << "   ";
-	}
-	cout << "B:";
-	for (int i = 1; i <= MAX - 1; i++)
-	{
+			printf("  ");
+	printf("B: ");
+	for (int i = 1; i <= MAX; i++)
 		if (Tower[TowerB][i])
-			cout << setw(2) << Tower[TowerB][i];
+			printf("%d ", Tower[TowerB][i]);
 		else
-			cout << "   ";
-	}
-	cout << "C:";
-	for (int i = 1; i <= MAX - 1; i++)
-	{
+			printf("  ");
+	printf("C: ");
+	for (int i = 1; i < MAX; i++)
 		if (Tower[TowerC][i])
-			cout << setw(2) << Tower[TowerC][i];
+			printf("%d ", Tower[TowerC][i]);
 		else
-			cout << "   ";
-	}
-	cout << endl;
+			printf("  ");
+	printf("\n");
 }
+void Hanoi_of_num(int n, int A, int B, int C, int& num)//所在的柱子与中转的柱子
+{            //从A借助B将盘子转移到C	
+	if (n == 0)
+		return;
+	Hanoi_of_num(n - 1, A, C, B, num);
+	printf("第<%4d>步 :%c-->%c.  ", ++num, A + 'A', C + 'A');
+	Tower[C][++Tops[C]] = Tower[A][Tops[A]];
+	Tower[A][Tops[A]--] = 0;
+	print();
+	Hanoi_of_num(n - 1, B, A, C, num);
+}
+
+
 void Show_vector(int& num, int from, int to)
 {
 	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
 	gotoxy(handle,1,21);
 	setcolor(handle,COLOR_BLACK,COLOR_WHITE);
-	for (int i = MAX - 1; i >= 1; i--)
+	for (int i = MAX-1; i > 0; i--)
 	{
 		cout << "             ";
 		if (Tower[TowerA][i])
@@ -174,8 +193,20 @@ void Show_vector(int& num, int from, int to)
 	cout << "             =============================" << endl;
     cout << "                  A      B      C     " << endl;
     printf("第%4d步 :%c-->%c.", ++num, from + 'A', to + 'A');
-	Show_Number();
+	print();
     Sleep(Sleep_Time);
+}
+
+void Hanoi_of_vector(int n, int A, int B, int C, int& num)//所在的柱子与中转的柱子
+{            //从A借助B将盘子转移到C	
+	if (n == 0)
+		return;
+	Hanoi_of_vector(n - 1, A, C, B, num);
+	
+	Tower[C][++Tops[C]] = Tower[A][Tops[A]];
+	Tower[A][Tops[A]--] = 0;
+	Show_vector(num, A, C);
+	Hanoi_of_vector(n - 1, B, A, C, num);
 }
 /*********************
     用来展示三座塔  
@@ -196,6 +227,7 @@ void Show_Tower1()
 			Sleep(50);
 		}
 	}
+	setcolor(handle, COLOR_BLACK, COLOR_WHITE);
 	return;
 }
 /**********************
@@ -213,6 +245,8 @@ void Show_Tower2(int Level,int loaction )
 	//	color++;
 		Sleep(100);
 	}
+	setcolor(handle, COLOR_BLACK, COLOR_WHITE);
+	system("pause");
 	return;
 }
 
@@ -236,7 +270,8 @@ void Show_Tower3(int Level,int From,int To)
     //需要移动的盘子的横坐标
 
 	MOVE_Plate(3,From,To,Level,1,color-1);
-	
+	setcolor(handle, COLOR_BLACK, COLOR_WHITE);
+	system("pause");
 }
 /******************
 实现有图有真相的汉诺塔游戏全过程
@@ -246,40 +281,28 @@ void Hanio(int Level, int FROM, int To, int By,int &num)
 	if (Level ==0)return;
 	Hanio(Level - 1, FROM, By, To,num);
 	Tower[To][++Tops[To]] = Tower[FROM][Tops[FROM]];	
-	int length = 2*(Tower[FROM][Tops[FROM]])+1;
+	int length = 2 * (Tower[FROM][Tops[FROM]]) + 1;
 	
-	if (Mode == 1)
-		Show_Number();
-	else
-	{
-		Show_vector(num, FROM, To);
-		if(Mode==6)
-		   MOVE_Plate(length, FROM, To, Tops[FROM], Tops[To], Tower[FROM][Tops[FROM]]);
-	}
+	MOVE_Plate(length, FROM, To, Tops[FROM] + 0, Tops[To], Tower[FROM][Tops[FROM]]);
+	Tower[FROM][Tops[FROM]--] = 0; 
+	Show_vector(num, FROM, To);
 	
-	Tower[FROM][Tops[FROM]--] = 0;
+	
 	Hanio(Level-1, By, To, FROM,num);
 }
-void Hanio_(int Level,int FROM,int To,int By)
+void Hanio_(int Level, int FROM, int To, int By)
 {
-	if(Mode!=1)
-	  system("cls");
+	if (Mode != 1)
+		system("cls");
 	printf("一共有%d层,从%c塔移动到%c塔", Level, FROM + 'A', To + 'A');
 	for (int i = 1; i <= Level; i++)
 		Tower[FROM][i] = Level - i + 1;
 	Tops[FROM] = Level;
-	
-	if(Mode==6)
-	   Show_Tower2(Level, FROM);
+
+	if (Mode == 6)
+		Show_Tower2(Level, FROM);
 	int num = 0;
 	Hanio(Level, FROM, To, By, num);
-}
-
-void Hanio_Game(int From,int To)
-{
-
-
-
 }
 void  Preprocessing()
 {
@@ -406,9 +429,22 @@ int main()
 		if (Mode == 0)
 			break;
 		else if (Mode == 1)
-			Hanio_(level, From, To, 3 - (From + To));
-		else if (Mode == 2)
-			Hanio_(level, From, To, 3 - (From + To));
+		{
+			Empty();
+			for (int i = 1; i <= level; i++)
+				Tower[From][i] = level - i + 1;
+			Tops[From] = level;
+			int step = 0;
+			Hanoi_of_num(level, From, 3 - (From + To) ,To, step);
+		}
+		else if (Mode == 2) {
+			Empty();
+			for (int i = 1; i <= level; i++)
+				Tower[From][i] = level - i + 1;
+			Tops[From] = level;
+			int step = 0;
+			Hanoi_of_vector(level, From, 3 - (From + To), To, step);
+		}
 		else if (Mode == 3)
 			Show_Tower1();
 		else if (Mode == 4)
@@ -419,7 +455,7 @@ int main()
 		{
 			while (true)
 			{
-				cout << "请输入延时的时间长短:(0-按回车进行下一步,1--延时最短,5--延时最长)";
+				cout << "请输入延时的时间长短:(0-按回车进行下一步,1--延时最长,5--延时最短)";
 				cin >> Type;
 				if (cin.fail())
 				{
@@ -443,7 +479,7 @@ int main()
 		while (true)
 		{
 			
-			cout << "输入回车键返回" << endl;
+			cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n输入回车键返回" << endl;
 			a = _getch();
 			if (a == '\n' || a == '\r')
 				break;

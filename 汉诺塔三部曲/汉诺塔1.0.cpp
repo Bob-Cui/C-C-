@@ -33,16 +33,16 @@ void print()
 			printf("  ");
 	printf("\n");
 }
-void Hanoi(int n, int A, int B, int C,int &num)//所在的柱子与中转的柱子
+void Hanoi_of_num(int n, int A, int B, int C,int &num)//所在的柱子与中转的柱子
 {            //从A借助B将盘子转移到C	
 	if (n == 0)
 		return;
-	Hanoi(n - 1, A, C, B, num);
+	Hanoi_of_num(n - 1, A, C, B, num);
 	printf("第<%4d>步 :%c-->%c.  ", ++num, A+'A', C+'A');
 	Tower[C][++Top[C]] = Tower[A][Top[A]];
 	Tower[A][Top[A]--] = 0;
 	print();
-	Hanoi(n - 1, B, A, C, num);
+	Hanoi_of_num(n - 1, B, A, C, num);
 }
 int main()
 {
@@ -53,6 +53,6 @@ int main()
 	for (int i = 1; i <= level; i++)
 		Tower[TowerA][i] = level - i+1;
 	Top[TowerA] = level;
-	Hanoi(level, TowerA, TowerB, TowerC, num);
+	Hanoi_of_num(level, TowerA, TowerC, TowerB, num);
 	return 0;
 }
